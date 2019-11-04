@@ -7,6 +7,8 @@ console menu introduced
 
 ### version 0.0.2
 19-11-04
+git version control introduced
+added CHANGELOG, README, and LICENSE documents 
 
 ## Future changes
 
