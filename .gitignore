@@ -1,0 +1,8 @@
+# files and folders excluded from git version control
+
+# ignored code editor meta files
+.idea
+*.iml
+
+# ignored output directories
+out
