@@ -8,7 +8,11 @@ console menu introduced
 ### version 0.0.2
 19-11-04
 git version control introduced
-added CHANGELOG, README, and LICENSE documents 
+added CHANGELOG, README, and LICENSE documents
+
+### version 0.0.3
+19-11-05
+introduce simplified IO object as parameter of menu
 
 ## Future changes
 

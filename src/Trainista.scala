@@ -1,6 +1,6 @@
 import java.util.UUID
 
-import scala.io.StdIn
+import scala.annotation.tailrec
 
 object Trainista extends App {
 
@@ -8,19 +8,44 @@ object Trainista extends App {
 
   // model
 
+  trait LineIO {
+    def readLine(text: String): String
+    def readLine(): String
+    def printLine(x: Any): Unit
+  }
+
+  case object ConsoleIO extends LineIO {
+    import scala.io.StdIn
+
+    override def readLine(text: String): String = StdIn.readLine(text)
+
+    override def readLine(): String = StdIn.readLine()
+
+    override def printLine(x: Any): Unit = println(x)
+  }
+
+  sealed trait Result
+
+  case object Completed extends Result
+
+  case class Continued(message: String) extends Result
+
   type Nick = String
 
+  /* todo
+      Exercise will become de-formalized into a class and its sub-classes will become de-formalized into its instances,
+      allowing easy deserialization from configuration or other record type, by mapping value-to-value, not value-to-class
+   */
   trait Exercise {
-    def code: Nick = UUID.randomUUID().toString
-    def name: String
-    def form: String
-    def intro: String
-    def parts: Seq[Part] // todo not all exercises will have multiple parts, consider refactoring to 'solution'
+    // auxiliary members
+    def code: Nick = UUID.randomUUID().toString // will be used as identifier by other model objects
+    def form: String // note will be used to deserialize into specific
 
-    // todo add runExercise which handles offsets, name, intro, run, and conclusion
-    def run(): Unit = {
-      println(intro)
-    }
+    // essential members
+    def name: String
+    def description: String
+    def solution: Seq[Part] // todo not all exercises will have multiple parts, consider refactoring to 'solution'
+    def validate(input: String): Result
   }
 
   trait Part {
@@ -29,24 +54,22 @@ object Trainista extends App {
 
   case class ListingPart(answers: String*) extends Part
 
-  case class Listing(name: String, intro: String, parts: ListingPart*) extends Exercise {
+  case class Listing(name: String, description: String, solution: ListingPart*) extends Exercise {
     override val form: String = "listing"
 
-    override def run(): Unit = {
-      super.run() // todo refactor this away
-      println("Exercise completed.\n")
-    }
+    // todo continue later
+    val receptors: Map[String, Seq[String]] = solution.flatMap(part => part.answers.map(answer => answer -> part.answers)).toMap
+    val progress: Map[Seq[String], Boolean] = null // todo continue later
+
+    override def validate(input: String): Result = Completed // todo later
   }
 
   case class PairingPart(term: String, answers: String*) extends Part
 
-  case class Pairing(name: String, intro: String, parts: PairingPart*) extends Exercise {
+  case class Pairing(name: String, description: String, solution: PairingPart*) extends Exercise {
     override val form: String = "pairing"
 
-    override def run(): Unit = {
-      super.run()
-      println("Exercise completed.\n")
-    }
+    override def validate(input: String): Result = Completed // todo later
   }
 
   // data
@@ -69,29 +92,48 @@ object Trainista extends App {
 
   // controller
 
-  def runMenu(): Unit = {
-    println("Exercise options:")
-    exercises.map(_.name).zipWithIndex.foreach {
-      case (name, index) => println(s"$index: $name")
+
+  case class Menu(io: LineIO) {
+
+    def start(): Unit = {
+      io.printLine("Trainista started.")
+      stateOptions()
     }
-    println("To quit the program enter 'quit'.")
-    runInput()
 
-    /* todo
-    *   take user input
-    *   if matches exercise index, run exercise, then menu again
-    *   if matches 'quit' exit
-    *   else inform input not recognized and ask for input again.
-    */
-
-    def runInput(input: String = StdIn.readLine("entered option: ")): Unit =
-      input match {
-        case Int(n) if exercises.indices.contains(n) =>
-          exercises(n).run()
-          runMenu()
-        case "quit" => println("Bye.")
-        case unknown => println(s"Input '$unknown' not recognized, try again.")
+    def stateOptions(): Unit = {
+      io.printLine("Exercise options:")
+      exercises.map(_.name).zipWithIndex.foreach {
+        case (name, index) => io.printLine(s"$index: $name")
       }
+      io.printLine("To quit the program enter 'quit'.")
+      handleOption()
+
+      def run(exercise: Exercise): Unit = {
+        io.printLine(exercise.description)
+        exercise.validate(io.readLine()) match {
+          case Completed =>
+            io.printLine("Exercise completed.\n")
+          case Continued(message) =>
+            io.printLine(message)
+            exercise.validate(io.readLine())
+        }
+
+      }
+
+      @tailrec
+      def handleOption(input: String = io.readLine("enter option: ")): Unit =
+        input match {
+          case Int(n) if exercises.indices.contains(n) =>
+            run(exercises(n))
+            stateOptions()
+          case "quit" =>
+            io.printLine("Bye.")
+          case unknown =>
+            io.printLine(s"Input '$unknown' not recognized, provide another input.")
+            handleOption()
+        }
+    }
+
   }
 
   // source: https://stackoverflow.com/questions/1075676/scala-match-and-parse-an-integer-string
@@ -105,8 +147,6 @@ object Trainista extends App {
 
 
   // program execution
-
-  println("Trainista launched.")
-  runMenu()
+  Menu(ConsoleIO).stateOptions()
 
 }
