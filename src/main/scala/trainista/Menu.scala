@@ -1,5 +1,7 @@
 package trainista
 
+import trainista.Communication.Message._
+import trainista.Communication._
 import trainista.Trainista.LineIO
 import trainista.Result._
 import trainista.extractor.Int
@@ -9,23 +11,23 @@ import scala.annotation.tailrec
 case class Menu(io: LineIO, exercises: Seq[Exercise]) {
 
   def start(): Unit = {
-    io.printLine("Trainista started.\n")
+    io.printLine(ApplicationStarted)
     stateOptions()
   }
 
   def stateOptions(): Unit = {
-    io.printLine("Exercise options:")
-    exercises.map(_.name).zipWithIndex.foreach {
-      case (name, index) => io.printLine(s"$index: $name")
+    io.printLine(ExerciseOptions)
+    exercises.zipWithIndex.foreach {
+      case (exercise, index) => io.printLine(Message.ExerciseOption(index, exercise))
     }
-    io.printLine("To quit the program enter 'quit'.")
+    io.printLine(HowToQuit)
     handleOption()
 
     def run(exercise: Exercise): Unit = {
       io.printLine(exercise.description)
       exercise.validate(io.readLine()) match {
         case Completed =>
-          io.printLine("Exercise completed.\n")
+          io.printLine(ExerciseCompleted)
         case Continued(message) =>
           io.printLine(message)
           exercise.validate(io.readLine())
@@ -34,15 +36,15 @@ case class Menu(io: LineIO, exercises: Seq[Exercise]) {
     }
 
     @tailrec
-    def handleOption(input: String = io.readLine("enter option: ")): Unit =
+    def handleOption(input: String = io.readLine(RequestInput)): Unit =
       input match {
         case Int(n) if exercises.indices.contains(n) =>
           run(exercises(n))
           stateOptions()
-        case "quit" =>
-          io.printLine("Bye.")
+        case Command.Quit =>
+          io.printLine(Bye)
         case unknown =>
-          io.printLine(s"Input '$unknown' not recognized, provide another input.")
+          io.printLine(InputNotRecognized(unknown))
           handleOption()
       }
   }

@@ -19,12 +19,13 @@ introduced simplified IO object as parameter of menu
 refactored code into proper package structure
 introduce simplified unit test stub structure via assertions
 
-## Future changes
+### version 0.0.5
+19-11-07
+commands and messages were refactored out into `Communication` object
+testable io `TestIO' implemented
+unit test for quit implemented
 
-### testing prerequisites
-introduce simplified IO object
-refactor menu into instantiable object  
-introduce simplified unit tests
+## Future changes
 
 ### configurability prerequisites
 introduce dependency management system, probably sbt
@@ -40,3 +41,17 @@ field will be unique for different Exercise types and thus sufficient indicator 
 introduce dependency management system, sbt
 introduce ScalaTest dependency
 organize tests into test suite
+
+### interrupting an exercise
+implement stopping an exercise upon 'stop' text input
+as a fallback of exercise input validation
+
+### test for handling terminating and invalid user menu input
+
+## Implemented
+
+### testing prerequisites
+introduce simplified IO object
+refactor menu into instantiable object  
+introduce simplified unit tests
+19-11-06
