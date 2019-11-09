@@ -7,7 +7,7 @@ object Communication {
   }
 
   object Message {
-    val ApplicationStarted: String = "Trainista started.\n"
+    val ApplicationStarted: String = "Trainista started.\n" // todo change to trainista menu
     val ExerciseOptions: String = "Exercise options:"
     val ExerciseOption: (Int, Exercise) => String = (index, ex) => s"$index: ${ex.name}"
     val HowToQuit: String = s"To quit the program enter '${Command.Quit}'."

@@ -2,13 +2,14 @@ package trainista
 
 import trainista.Communication.Command._
 import trainista.Communication.Message._
+import trainista.Exercise._
 import trainista.Trainista.LineIO
 
 import scala.collection.mutable.ArrayBuffer
 
 object TestSuite extends App {
 
-  case class TestIO(input: Seq[String]) extends LineIO {
+  case class TestIO(input: String*) extends LineIO {
 
     private val inputs = input.iterator
 
@@ -21,23 +22,52 @@ object TestSuite extends App {
     val output: ArrayBuffer[String] = ArrayBuffer()
   }
 
+  // todo ? find convenient method to setup test io and test menu with useful defaults, bellow is not that useful
+  //  object Menu {
+//    def apply(io: LineIO): Menu = new Menu(io, exercises = Nil)
+//  }
+  // perhaps wrap TestIO inside of Testing class with Menu, output, io fields; with auto-start
+
+  val mockListExercise = Listing("Mock Listing", "mock listing description")
+  val mockPairingExercise = Pairing("Mock Pairing", "mock pairing description ")
+
   // Menu specification
 
-  // quit recognition test
+  // quit recognition specification
   assert ({
-    val input = Seq(Quit)
-    val io = TestIO(input)
-
+    val io = TestIO(Quit)
     Menu(io, exercises = Nil).start()
     io.output.last == Bye
   }, s"Menu did not respond to '$Quit' input with '$Bye' message.")
 
-  // todo implement improper input handling test
+  // improper input handling specification
   assert {
+    val unrecognizable = "unrecognizable"
+    val io = TestIO(unrecognizable, Quit)
+    Menu(io, exercises = Nil).start()
+    io.output contains InputNotRecognized(unrecognizable)
+  }
+
+  // specification for
+  // proper menu introduction
+  // listing exercise options in proper order
+  // quit command explanation
+  assert {
+    // todo add other spec parts
+    val io = TestIO(Quit)
+    val exercises = Seq(mockListExercise, mockPairingExercise)
+    Menu(io, exercises).start()
+    val options = exercises.zipWithIndex.map { case (ex, index) => ExerciseOption(index, ex)}
+    options forall io.output.contains
+  }
+
+  // specification for
+  // correct menu exercise selection
+  assert {
+    // todo implement
     true
   }
 
-  // todo implement test for correct listing of all exercises
 
   // Exercise specification
 

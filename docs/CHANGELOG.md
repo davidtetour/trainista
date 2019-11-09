@@ -25,33 +25,6 @@ commands and messages were refactored out into `Communication` object
 testable io `TestIO' implemented
 unit test for quit implemented
 
-## Future changes
-
-### configurability prerequisites
-introduce dependency management system, probably sbt
-introduce configuration dependency, probably PureConfig
-extract exercise content into configuration
-
-### dropping the form field
-the `form` field was originally intended as an identifier of the Exercise
-type for future deserialization; it seems however, that the structure of the `solution`
-field will be unique for different Exercise types and thus sufficient indicator of Exercise type
-
-### prerequisites for proper unit tests
-introduce dependency management system, sbt
-introduce ScalaTest dependency
-organize tests into test suite
-
-### interrupting an exercise
-implement stopping an exercise upon 'stop' text input
-as a fallback of exercise input validation
-
-### test for handling terminating and invalid user menu input
-
-## Implemented
-
-### testing prerequisites
-introduce simplified IO object
-refactor menu into instantiable object  
-introduce simplified unit tests
-19-11-06
+### version 0.0.6
+19-11-09
+menu unit tests added, additional ones drafted
