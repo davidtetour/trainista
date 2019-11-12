@@ -26,6 +26,19 @@ introduce `AtomicExercise` and `CompoundExercise`
 include `mascot` as an inherited field from `Mascot` trait
 follow up with dropping `form` field, to remove all non-essential fields
 
+### Refactor Menu to a Loop
+The core of the program is in fact a state loop that loops between presenting menu and
+presenting an exercise until the program is ended with quit. 
+The behavior of the program seems very similar to conventional main game loops.
+Additional loops may be introduced initiating from the presenting of the menu,
+such as showing stats.
+Additional refactorings: 
+ - exercise option -> exercise choice
+ - running menu -> presenting menu
+ - running exercise -> presenting exercise
+Eventually a proper state transition mechanism may be implemented, where the dialogue
+with the user is an effect / trigger of such state changes.
+
 ## Implemented
 
 ### testing prerequisites
